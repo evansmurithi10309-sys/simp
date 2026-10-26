@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nice to meet you!</title>
+    <!-- Google Fonts for cute hand-drawn quote aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Soft, romantic aesthetic gradient background */
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+        
+        /* Floating background shapes */
+        .bg-shapes {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .bg-icon {
+            position: absolute;
+            bottom: -50px;
+            color: rgba(255, 255, 255, 0.7);
+            animation: floatUp infinite linear;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(360deg) scale(1.5); opacity: 0; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(255, 154, 158, 0.3);
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+        h1, h2 {
+            color: #ff6b81;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #57606f;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            min-height: 50px;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: bold;
+        }
+        .btn-yes {
+            background: linear-gradient(45deg, #ff4757, #ff6b81);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+            z-index: 2;
+        }
+        .btn-yes:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 71, 87, 0.5);
+        }
+        .btn-no {
+            background-color: #f1f2f6;
+            color: #57606f;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Wheel styles */
+        .wheel-wrapper {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 20px auto;
+            filter: drop-shadow(0 10px 20px rgba(255, 71, 87, 0.2));
+        }
+        canvas {
+            border-radius: 50%;
+            border: 4px solid #fff;
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 35px;
+            color: #ff4757;
+            z-index: 10;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* Form styles */
+        .form-group {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ffeaa7;
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 1em;
+            transition: border-color 0.3s;
+            background: rgba(255,255,255,0.8);
+        }
+        input:focus {
+            outline: none;
+            border-color: #ff4757;
+            background: #fff;
+        }
+        
+        .hidden-message {
+            display: none;
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #ff4757;
+            font-weight: bold;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Floating Music Player Styles */
+        .music-player-widget {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 8px 14px 8px 10px;
+            border-radius: 50px;
+            box-shadow: 0 8px 25px rgba(255, 71, 87, 0.25);
+            border: 1.5px solid rgba(255, 255, 255, 0.9);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 320px;
+        }
+        .music-player-widget:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(255, 71, 87, 0.35);
+        }
+        .vinyl-disc {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #1e1e1e, #3a3a3a, #1e1e1e, #4a4a4a, #1e1e1e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .vinyl-disc::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff4757;
+            border: 2px solid #fff;
+        }
+        .vinyl-disc.playing {
+            animation: spinDisc 4s linear infinite;
+        }
+        @keyframes spinDisc {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .player-info-container {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            overflow: hidden;
+            flex-grow: 1;
+        }
+        .track-title {
+            font-size: 0.85em;
+            font-weight: 700;
+            color: #2f3542;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 130px;
+        }
+        .track-sub {
+            font-size: 0.7em;
+            color: #ff4757;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .eq-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 12px;
+        }
+        .eq-bar {
+            width: 2.5px;
+            height: 4px;
+            background: #ff4757;
+            border-radius: 2px;
+            transition: height 0.2s;
+        }
+        .music-player-widget.is-playing .eq-bar:nth-child(1) { animation: eqAnim 0.7s ease-in-out infinite alternate; }
+        .music-player-widget.is-playing .eq-bar:nth-child(2) { animation: eqAnim 0.5s ease-in-out infinite alternate 0.15s; }
+        .music-player-widget.is-playing .eq-bar:nth-child(3) { animation: eqAnim 0.9s ease-in-out infinite alternate 0.3s; }
+        @keyframes eqAnim {
+            0% { height: 3px; }
+            100% { height: 12px; }
+        }
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-ctrl {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: white;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(255, 71, 87, 0.3);
+            transition: transform 0.2s, background 0.2s;
+            padding: 0;
+        }
+        .btn-ctrl:hover {
+            transform: scale(1.1);
+        }
+        .btn-ctrl.secondary {
+            background: #f1f2f6;
+            color: #57606f;
+            box-shadow: none;
+        }
+        .btn-ctrl.secondary:hover {
+            background: #dfe4ea;
+            color: #ff4757;
+        }
+
+        /* Music Settings Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            text-align: left;
+            position: relative;
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-card h3 {
+            margin-top: 0;
+            color: #ff4757;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.4em;
+            cursor: pointer;
+            color: #a4b0be;
+            padding: 0;
+        }
+        .preset-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        .preset-btn {
+            background: #f8f9fa;
+            border: 1.5px solid #ffeaa7;
+            padding: 10px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #2f3542;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+        .preset-btn:hover, .preset-btn.active {
+            border-color: #ff4757;
+            background: #fff0f3;
+            color: #ff4757;
+        }
+
+        @media (max-width: 480px) {
+            .music-player-widget {
+                top: 10px;
+                right: 10px;
+                padding: 6px 12px 6px 8px;
+            }
+            .track-title {
+                max-width: 90px;
+            }
+        }
+
+
+
+        /* Discreet Developer Portal Styling */
+        .dev-portal-trigger {
+            position: fixed;
+            bottom: 6px;
+            right: 10px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.45);
+            cursor: pointer;
+            user-select: none;
+            z-index: 1000;
+            transition: color 0.3s;
+            font-family: monospace;
+        }
+        .dev-portal-trigger:hover {
+            color: rgba(255, 71, 87, 0.9);
+        }
+        .dev-data-box {
+            background: #1e1e2e;
+            color: #a6adc8;
+            padding: 15px;
+            border-radius: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.88em;
+            overflow-x: auto;
+            margin-top: 10px;
+            border: 1px solid #45475a;
+        }
+        .dev-badge {
+            display: inline-block;
+            background: #ff4757;
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Audio Player Widget -->
+    <div class="music-player-widget" id="music-widget">
+        <div class="vinyl-disc" id="vinyl-disc" onclick="togglePlayPause()" title="Play/Pause Music"></div>
+        <div class="player-info-container">
+            <span class="track-title" id="track-title">Romantic Piano Melody</span>
+            <div class="track-sub">
+                <span id="track-status">Click to Play</span>
+                <div class="eq-bars">
+                    <div class="eq-bar"></div>
+                    <div class="eq-bar"></div>
+                    <div class="eq-bar"></div>
+                </div>
+            </div>
+        </div>
+        <div class="player-controls">
+            <button class="btn-ctrl" id="play-toggle-btn" onclick="togglePlayPause()" title="Play/Pause">▶</button>
+            <button class="btn-ctrl secondary" onclick="openMusicModal()" title="Change Song / Add Song">🎵</button>
+        </div>
+    </div>
+
+    <!-- Hidden HTML5 Audio Element -->
+    <audio id="bg-audio" loop preload="auto">
+        <source id="audio-source" src="https://tr.ee/im2vMD5_qh" type="audio/mpeg">
+    </audio>
+
+    <!-- Music Customization Modal -->
+    <div class="modal-overlay" id="music-modal">
+        <div class="modal-card">
+            <h3>Custom Background Song 🎵 <button class="close-modal" onclick="closeMusicModal()">✕</button></h3>
+            <p style="font-size: 0.88em; color: #747d8c; margin-bottom: 12px; line-height: 1.4;">Select a curated romantic preset track or paste your favorite song's audio link below!</p>
+            
+            <div class="form-group">
+                <label style="font-size: 0.85em;">Select Preset Track:</label>
+                <div class="preset-list">
+                    <button class="preset-btn active" onclick="selectPreset('https://tr.ee/im2vMD5_qh', 'Special Song ✨', this)">
+                        <span>🔥 Special Song Track</span>
+                        <small style="color: #888;">Custom Link</small>
+                    </button>
+                    <button class="preset-btn" onclick="selectPreset('https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3', 'Romantic Piano Melody 🎹', this)">
+                        <span>🎹 Romantic Piano Melody</span>
+                        <small style="color: #888;">Soft & Gentle</small>
+                    </button>
+                    <button class="preset-btn" onclick="selectPreset('https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3', 'Acoustic Guitar Romance 🎸', this)">
+                        <span>🎸 Acoustic Guitar Romance</span>
+                        <small style="color: #888;">Sweet Vibes</small>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label style="font-size: 0.85em;">Or Paste Custom Song MP3 Link:</label>
+                <input type="url" id="custom-song-url" value="https://tr.ee/im2vMD5_qh" placeholder="https://example.com/your-song.mp3">
+            </div>
+
+            <div class="form-group">
+                <label style="font-size: 0.85em;">Song Title / Artist Name:</label>
+                <input type="text" id="custom-song-title" value="Special Song ✨" placeholder="e.g. Perfect - Ed Sheeran">
+            </div>
+
+            <button class="btn-yes" style="width: 100%; margin-top: 10px;" onclick="saveCustomSong()">Apply & Play Song ✨</button>
+        </div>
+    </div>
+
+    <!-- Screen 1: The Ask -->
+    <div class="container" id="main-container">
+        <h1>Hi there! 👋</h1>
+        <p>I know we just met, but I thought a simple text message was a bit too boring. So I made you this tiny website instead.</p>
+        <p>Would you consider going on a date with me sometime?</p>
+        
+        <div class="buttons" id="btn-container">
+            <button class="btn-yes" onclick="sayYes()">Yes, why not!</button>
+            <button class="btn-no" id="no-btn" onmouseover="moveNoButton()" ontouchstart="moveNoButton()">No thanks</button>
+        </div>
+    </div>
+
+    <!-- Screen 2: The Planner -->
+    <div class="container" id="planner-container" style="display: none;">
+        <h2>Let's plan it! 🎡</h2>
+        <p>Spin the wheel to decide the vibe, then pick when and where.</p>
+        
+        <div class="wheel-wrapper">
+            <div class="wheel-pointer">▼</div>
+            <canvas id="wheel" width="300" height="300"></canvas>
+        </div>
+        
+        <button class="btn-yes" id="spin-btn" onclick="spinWheel()">Spin the Wheel!</button>
+        <p id="wheel-result" style="font-size: 1.2em; font-weight: bold; color: #ff6b81; margin-top: 15px; min-height: 28px;"></p>
+        
+        <div id="details-form" style="display:none; margin-top: 25px;">
+            <div class="form-group">
+                <label>When are you free?</label>
+                <input type="datetime-local" id="date-time">
+            </div>
+            <div class="form-group">
+                <label>Where should we go?</label>
+                <input type="text" id="location" placeholder="e.g. Downtown, a quiet park, etc.">
+            </div>
+            
+            <button class="btn-yes" style="width: 100%; margin-top: 10px;" onclick="finalize()">Send it to me!</button>
+        </div>
+    </div>
+
+    <!-- Screen 3: Final Success -->
+    <div class="container" id="final-container" style="display: none;">
+        <h1>It's a Date! 🎉</h1>
+        <div style="background: linear-gradient(135deg, #fff0f3, #ffe6ea); padding: 22px; border-radius: 20px; margin-bottom: 20px; border: 2px dashed #ff78cb; box-shadow: 0 8px 25px rgba(255, 71, 87, 0.15);">
+            <div style="margin-bottom: 14px;">
+                <span style="font-size: 0.9em; font-weight: bold; color: #ff4757; text-transform: uppercase; letter-spacing: 0.5px;">⏰ Exact Date & Meeting Time</span>
+                <div id="final-exact-time" style="font-size: 1.35em; font-weight: 800; color: #d63031; background: #fff; padding: 12px 16px; border-radius: 12px; margin-top: 6px; border: 1.5px solid #ffb8c6; box-shadow: 0 4px 10px rgba(255, 71, 87, 0.1);">
+                    --
+                </div>
+            </div>
+            <p id="final-summary" style="font-size: 1.05em; color: #2d3436; margin: 0; line-height: 1.8; text-align: left;"></p>
+        </div>
+        <p>Screenshot this page and text it to me so we can lock it in!</p>
+        <div class="hidden-message" id="success-msg" style="display: block;">
+            Can't wait! ✨
+        </div>
+    </div>
+
+    <!-- Discreet Developer Portal Trigger -->
+    <div class="dev-portal-trigger" onclick="openDevPortal()" title="Dev Portal">· dev</div>
+
+    <!-- Developer Portal Modal -->
+    <div class="modal-overlay" id="dev-portal-modal">
+        <div class="modal-card" style="max-width: 460px;">
+            <h3>🛠️ Developer Portal <button class="close-modal" onclick="closeDevPortal()">✕</button></h3>
+            <p style="font-size: 0.85em; color: #747d8c; margin-bottom: 10px;">Barely noticeable portal to view everything she answered!</p>
+            
+            <div id="dev-responses-content">
+                <p style="font-size: 0.9em; color: #999;">No response submitted yet. (It will display here as soon as she clicks "Send it to me!")</p>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-yes" style="flex: 1; font-size: 0.9em; padding: 10px;" onclick="copyDevData()">Copy JSON Payload 📋</button>
+                <button class="btn-no" style="font-size: 0.9em; padding: 10px;" onclick="refreshDevPortal()">Refresh 🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Add Animated Background Elements ---
+        function createFloatingBackground() {
+            const container = document.createElement('div');
+            container.className = 'bg-shapes';
+            document.body.appendChild(container);
+            
+            // Emojis that match a cute/aesthetic vibe
+            const symbols = ['🤍', '🌸', '✨', '💖', '🦋', '🌷', '🍦'];
+            
+            for(let i=0; i<25; i++) {
+                const icon = document.createElement('div');
+                icon.className = 'bg-icon';
+                icon.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                icon.style.left = Math.random() * 100 + 'vw';
+                icon.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                icon.style.animationDelay = (Math.random() * 10) + 's';
+                icon.style.fontSize = (Math.random() * 15 + 15) + 'px';
+                container.appendChild(icon);
+            }
+        }
+        createFloatingBackground();
+
+
+
+        // --- Screen 1 Logic ---
+        function moveNoButton() {
+            const btn = document.getElementById('no-btn');
+            const randomX = (Math.random() - 0.5) * 200;
+            const randomY = (Math.random() - 0.5) * 200;
+            
+            btn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+            
+            const cheekyMessages = [
+                "Are you sure?", 
+                "Think again!", 
+                "I'm actually pretty fun", 
+                "Don't do it!", 
+                "Give it a chance!",
+                "Wrong button!"
+            ];
+            btn.innerText = cheekyMessages[Math.floor(Math.random() * cheekyMessages.length)];
+        }
+
+        function sayYes() {
+            document.getElementById('main-container').style.display = 'none';
+            document.getElementById('planner-container').style.display = 'block';
+            drawWheel(); 
+            createConfetti(30); 
+        }
+
+        // --- Screen 2 Logic (Wheel) ---
+        const sectors = [
+            { color: '#ff7675', label: 'Coffee', emoji: '☕' },
+            { color: '#55efc4', label: 'Ice Cream', emoji: '🍦' },
+            { color: '#74b9ff', label: 'Dinner', emoji: '🍝' },
+            { color: '#fdcb6e', label: 'Walk in Park', emoji: '🌸' },
+            { color: '#fab1a0', label: 'Movie', emoji: '🍿' },
+            { color: '#a29bfe', label: 'Drinks', emoji: '🥂' },
+            { color: '#dfe6e9', label: 'Surprise Me!', emoji: '🎁' }
+        ];
+
+        let currentRotation = 0;
+        let isSpinning = false;
+        let selectedVibe = "";
+
+        function drawWheel() {
+            const canvas = document.getElementById('wheel');
+            const ctx = canvas.getContext('2d');
+            const arc = (2 * Math.PI) / sectors.length;
+
+            sectors.forEach((sector, i) => {
+                const ang0 = i * arc;
+                const ang1 = (i + 1) * arc;
+                
+                ctx.beginPath();
+                ctx.fillStyle = sector.color;
+                ctx.moveTo(150, 150);
+                ctx.arc(150, 150, 150, ang0, ang1);
+                ctx.lineTo(150, 150);
+                ctx.fill();
+                
+                ctx.strokeStyle = "#fff";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                ctx.save();
+                ctx.translate(150, 150);
+                ctx.rotate(ang0 + arc / 2);
+                
+                ctx.textAlign = "center";
+                ctx.fillStyle = "#fff";
+                
+                ctx.font = "28px sans-serif";
+                ctx.fillText(sector.emoji, 115, 10);
+                
+                ctx.font = "bold 13px 'Segoe UI', Tahoma, sans-serif";
+                ctx.fillText(sector.label, 60, 5);
+                
+                ctx.restore();
+            });
+        }
+
+        function spinWheel() {
+            if (isSpinning) return;
+            isSpinning = true;
+            
+            const canvas = document.getElementById('wheel');
+            const spins = Math.floor(Math.random() * 5) + 5; 
+            const randomDegree = Math.floor(Math.random() * 360);
+            
+            currentRotation += (spins * 360) + randomDegree;
+            
+            canvas.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+            
+            document.getElementById('wheel-result').innerText = "Spinning... ✨";
+            document.getElementById('spin-btn').disabled = true;
+            document.getElementById('spin-btn').style.opacity = '0.5';
+            
+            setTimeout(() => {
+                const normalizedRotation = currentRotation % 360;
+                const pointerAngle = (270 - normalizedRotation + 360) % 360;
+                const sectorIndex = Math.floor(pointerAngle / (360 / sectors.length));
+                
+                selectedVibe = sectors[sectorIndex].label;
+                const selectedEmoji = sectors[sectorIndex].emoji;
+                
+                document.getElementById('wheel-result').innerText = `Looks like we're doing: ${selectedVibe}! ${selectedEmoji}`;
+                document.getElementById('details-form').style.display = 'block';
+                isSpinning = false;
+                
+                document.getElementById('spin-btn').innerText = "Spin Again?";
+                document.getElementById('spin-btn').disabled = false;
+                document.getElementById('spin-btn').style.opacity = '1';
+                
+            }, 4000);
+        }
+
+        // --- Screen 3 Logic (Finalize) ---
+        function finalize() {
+            const dateTime = document.getElementById('date-time').value;
+            const location = document.getElementById('location').value;
+            
+            if (!dateTime || !location) {
+                alert("Please pick a time and place so we know when to meet! 😉");
+                return;
+            }
+
+            const dateObj = new Date(dateTime);
+            const formattedDate = dateObj.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute:'2-digit' });
+
+            document.getElementById('planner-container').style.display = 'none';
+            document.getElementById('final-container').style.display = 'block';
+            
+            // Set exact meeting time badge
+            const exactTimeBox = document.getElementById('final-exact-time');
+            if (exactTimeBox) {
+                exactTimeBox.innerHTML = `📆 ${formattedDate}`;
+            }
+
+            document.getElementById('final-summary').innerHTML = `
+                <strong>Vibe:</strong> ${selectedVibe} <br>
+                <strong>Where:</strong> ${location} <br>
+                <strong>Status:</strong> Confirmed & Locked In! 💖
+            `;
+            
+            // Store response in localStorage for Developer Portal
+            const devPayload = {
+                vibe: selectedVibe,
+                rawDateTime: dateTime,
+                formattedDate: formattedDate,
+                location: location,
+                submittedAt: new Date().toLocaleString()
+            };
+            localStorage.setItem('invitation_dev_response', JSON.stringify(devPayload));
+
+            createConfetti(100);
+        }
+
+        // --- Confetti Utility ---
+        function createConfetti(amount) {
+            const colors = ['#ff4757', '#2ed573', '#1e90ff', '#ffa502', '#ff6348', '#ff78cb', '#ffffff'];
+            for(let i=0; i<amount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'fixed';
+                    confetti.style.width = (Math.random() * 8 + 5) + 'px';
+                    confetti.style.height = (Math.random() * 8 + 5) + 'px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = '-10px';
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confetti.style.zIndex = '1000';
+                    
+                    document.body.appendChild(confetti);
+                    
+                    const animationDuration = Math.random() * 2 + 2;
+                    confetti.animate([
+                        { transform: 'translate3d(0,0,0) rotate(0deg)', opacity: 1 },
+                        { transform: `translate3d(${Math.random()*200 - 100}px, 100vh, 0) rotate(${Math.random()*720}deg)`, opacity: 0 }
+                    ], {
+                        duration: animationDuration * 1000,
+                        easing: 'cubic-bezier(.37,0,.63,1)',
+                        iterations: 1
+                    });
+                    
+                    setTimeout(() => confetti.remove(), animationDuration * 1000);
+                }, i * 20);
+            }
+        }
+
+        // --- Developer Portal Handlers ---
+        function openDevPortal() {
+            const modal = document.getElementById('dev-portal-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                renderDevPortalContent();
+            }
+        }
+
+        function closeDevPortal() {
+            const modal = document.getElementById('dev-portal-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function renderDevPortalContent() {
+            const container = document.getElementById('dev-responses-content');
+            const savedData = localStorage.getItem('invitation_dev_response');
+
+            if (!savedData) {
+                container.innerHTML = `
+                    <div style="background: #fff0f3; padding: 15px; border-radius: 12px; border: 1.5px dashed #ff78cb; text-align: center; color: #ff4757;">
+                        <strong>No submission yet ⏳</strong>
+                        <p style="font-size: 0.85em; margin: 5px 0 0 0; color: #666;">When she picks a date/time & location and clicks "Send it to me!", her full response will appear right here!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const data = JSON.parse(savedData);
+                container.innerHTML = `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 14px; border: 1.5px solid #e1e8ed; text-align: left;">
+                        <div style="margin-bottom: 8px;"><span class="dev-badge">SUCCESS</span> <span style="font-size: 0.8em; color: #888; float: right;">${data.submittedAt}</span></div>
+                        <div style="margin: 6px 0; font-size: 0.95em;"><strong>🎡 Chosen Vibe:</strong> <span style="color: #ff4757; font-weight: bold;">${data.vibe}</span></div>
+                        <div style="margin: 6px 0; font-size: 0.95em;"><strong>⏰ Exact Date & Time:</strong> <span style="color: #2e86de; font-weight: bold;">${data.formattedDate}</span></div>
+                        <div style="margin: 6px 0; font-size: 0.95em;"><strong>📍 Location:</strong> <span style="color: #10ac84; font-weight: bold;">${data.location}</span></div>
+                        
+                        <div class="dev-data-box">
+                            <pre style="margin: 0; white-space: pre-wrap; word-break: break-all;">${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    </div>
+                `;
+            } catch(e) {
+                container.innerHTML = `<p style="color: red;">Error reading response data.</p>`;
+            }
+        }
+
+        function refreshDevPortal() {
+            renderDevPortalContent();
+        }
+
+        function copyDevData() {
+            const savedData = localStorage.getItem('invitation_dev_response');
+            if (!savedData) {
+                alert("No submission data available to copy yet!");
+                return;
+            }
+            navigator.clipboard.writeText(savedData).then(() => {
+                alert("JSON Payload copied to clipboard! 📋");
+            }).catch(() => {
+                alert("Copied payload: " + savedData);
+            });
+        }
+
+        // --- Music Player Logic ---
+        const bgAudio = document.getElementById('bg-audio');
+        const playToggleBtn = document.getElementById('play-toggle-btn');
+        const vinylDisc = document.getElementById('vinyl-disc');
+        const musicWidget = document.getElementById('music-widget');
+        const trackTitle = document.getElementById('track-title');
+        const trackStatus = document.getElementById('track-status');
+        let userInteracted = false;
+
+        function initMusicPlayer() {
+            const defaultSongUrl = "https://tr.ee/im2vMD5_qh";
+            const defaultSongTitle = "Special Song ✨";
+
+            const savedUrl = localStorage.getItem('invitation_song_url') || defaultSongUrl;
+            const savedTitle = localStorage.getItem('invitation_song_title') || defaultSongTitle;
+
+            setSong(savedUrl, savedTitle);
+            const urlInput = document.getElementById('custom-song-url');
+            const titleInput = document.getElementById('custom-song-title');
+            if (urlInput) urlInput.value = savedUrl;
+            if (titleInput) titleInput.value = savedTitle;
+        }
+
+        function setSong(url, title) {
+            const audioSource = document.getElementById('audio-source');
+            const wasPlaying = !bgAudio.paused;
+            
+            bgAudio.pause();
+            audioSource.src = url;
+            bgAudio.load();
+            
+            if (trackTitle) trackTitle.innerText = title;
+
+            if (wasPlaying) {
+                bgAudio.play().then(() => updatePlayerUI(true)).catch(err => console.log('Playback error:', err));
+            } else {
+                updatePlayerUI(false);
+            }
+        }
+
+        function togglePlayPause() {
+            if (bgAudio.paused) {
+                bgAudio.play().then(() => {
+                    updatePlayerUI(true);
+                }).catch(err => {
+                    console.log("Autoplay blocked or audio load error:", err);
+                    updatePlayerUI(false);
+                });
+            } else {
+                bgAudio.pause();
+                updatePlayerUI(false);
+            }
+        }
+
+        function updatePlayerUI(isPlaying) {
+            if (isPlaying) {
+                if (playToggleBtn) {
+                    playToggleBtn.innerText = '❚❚';
+                    playToggleBtn.title = 'Pause';
+                }
+                if (vinylDisc) vinylDisc.classList.add('playing');
+                if (musicWidget) musicWidget.classList.add('is-playing');
+                if (trackStatus) trackStatus.innerText = 'Playing... ✨';
+            } else {
+                if (playToggleBtn) {
+                    playToggleBtn.innerText = '▶';
+                    playToggleBtn.title = 'Play';
+                }
+                if (vinylDisc) vinylDisc.classList.remove('playing');
+                if (musicWidget) musicWidget.classList.remove('is-playing');
+                if (trackStatus) trackStatus.innerText = 'Click to Play';
+            }
+        }
+
+        // Global click listener to auto-start audio on first interaction
+        document.addEventListener('click', function autoPlayOnFirstInteraction() {
+            if (!userInteracted && bgAudio.paused) {
+                userInteracted = true;
+                bgAudio.play().then(() => {
+                    updatePlayerUI(true);
+                }).catch(e => {
+                    // browser autoplay block fallback
+                });
+            }
+        }, { once: true });
+
+        // Music Settings Modal Controls
+        function openMusicModal() {
+            const modal = document.getElementById('music-modal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closeMusicModal() {
+            const modal = document.getElementById('music-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function selectPreset(url, title, element) {
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+            if (element) element.classList.add('active');
+            const urlInput = document.getElementById('custom-song-url');
+            const titleInput = document.getElementById('custom-song-title');
+            if (urlInput) urlInput.value = url;
+            if (titleInput) titleInput.value = title;
+        }
+
+        function saveCustomSong() {
+            const customUrl = document.getElementById('custom-song-url').value.trim();
+            const customTitle = document.getElementById('custom-song-title').value.trim() || 'Custom Romantic Song 🎵';
+
+            if (!customUrl) {
+                alert("Please select a preset track or enter a valid song audio URL!");
+                return;
+            }
+
+            setSong(customUrl, customTitle);
+            localStorage.setItem('invitation_song_url', customUrl);
+            localStorage.setItem('invitation_song_title', customTitle);
+
+            bgAudio.play().then(() => {
+                updatePlayerUI(true);
+            }).catch(err => console.log('Playback error:', err));
+
+            closeMusicModal();
+        }
+
+        // Initialize music settings
+        initMusicPlayer();
+    </script>
+</body>
+</html>
